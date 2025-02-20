@@ -6,4 +6,5 @@ tags
 
 **/*.tar
 **/.DS_Store
+sdk
 .env
