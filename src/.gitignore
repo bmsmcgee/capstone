@@ -1,0 +1,7 @@
+build
+cscope.*
+tags
+*.swp
+.vscode/settings.json
+
+**/*.tar

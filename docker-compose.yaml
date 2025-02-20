@@ -1,0 +1,16 @@
+services:
+  firmware-container:
+    image: debian:bookworm-slim
+    container_name: firmware-dev
+    restart: always
+    privileged: true
+    volumes:
+      - ~/Desktop/rodeo-app-examples/src:/rodeo-app-examples
+    # devices:
+    #   - "/dev:/dev"
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    command: ["bash"]
+    stdin_open: true
+    tty: true
+    entrypoint: ["/bin/bash", "-c", "apt-get update && apt-get install -y vim git tar make cmake && exec bash"]

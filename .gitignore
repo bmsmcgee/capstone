@@ -1,0 +1,10 @@
+build
+cscope.*
+tags
+*.swp
+.vscode/settings.json
+
+**/*.tar
+**/.DS_Store
+sdk
+.env
