@@ -5,7 +5,8 @@ services:
     restart: always
     privileged: true
     volumes:
-      - ~/Desktop/capstone/src:/capstone
+      - ./src:/capstone
+      - ./sdk/se-rodeo-iot-sdk:/opt/se-rodeo-iot-sdk
     # devices:
     #   - "/dev:/dev"
     environment:
@@ -13,4 +14,7 @@ services:
     command: ["bash"]
     stdin_open: true
     tty: true
-    entrypoint: ["/bin/bash", "-c", "apt-get update && apt-get install -y vim git tar make cmake && exec bash"]
+    entrypoint: 
+      - "/bin/bash"
+      - "-c"
+      - "apt-get update && apt-get install -y vim git tar make cmake && exec bash"
