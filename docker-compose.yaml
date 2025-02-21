@@ -7,7 +7,7 @@ services:
     volumes:
       - ./src:/capstone
       - ./sdk/se-rodeo-iot-sdk:/opt/se-rodeo-iot-sdk
-      # - ./jlink/JLink_Linux_V812g_arm64.deb:/tmp/JLink_Linux_V812g_arm64.deb
+      - ./jlink/JLink_Linux_V812g_arm64.deb:/tmp/JLink_Linux_V812g_arm64.deb
     # devices:
     #   - "/dev:/dev"
     environment:
