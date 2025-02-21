@@ -1,20 +1,16 @@
 services:
   firmware-container:
-    image: debian:bookworm-slim
+    build: .
     container_name: firmware-dev
     restart: always
     privileged: true
     volumes:
       - ./src:/capstone
       - ./sdk/se-rodeo-iot-sdk:/opt/se-rodeo-iot-sdk
+      # - ./jlink/JLink_Linux_V812g_arm64.deb:/tmp/JLink_Linux_V812g_arm64.deb
     # devices:
     #   - "/dev:/dev"
     environment:
       - DEBIAN_FRONTEND=noninteractive
-    command: ["bash"]
     stdin_open: true
     tty: true
-    entrypoint: 
-      - "/bin/bash"
-      - "-c"
-      - "apt-get update && apt-get install -y vim git tar make cmake && exec bash"
