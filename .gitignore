@@ -6,6 +6,6 @@ tags
 
 **/*.tar
 **/.DS_Store
-sdk
+**/se-rodeo-iot-sdk
 .env
 jlink
