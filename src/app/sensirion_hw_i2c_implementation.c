@@ -54,7 +54,8 @@
  * @param bus_idx   Bus index to select
  * @returns         0 on success, an error code otherwise
  */
-int16_t sensirion_i2c_select_bus(uint8_t bus_idx) {
+int16_t sensirion_i2c_select_bus(uint8_t bus_idx)
+{
     // IMPLEMENT or leave empty if all sensors are located on one single bus
     return STATUS_FAIL;
 }
@@ -63,18 +64,25 @@ int16_t sensirion_i2c_select_bus(uint8_t bus_idx) {
  * Initialize all hard- and software components that are needed for the I2C
  * communication.
  */
-void sensirion_i2c_init(void) {
-    printf("[DEBUG] Initializing I2C hardware for SHT45...\n");
+void sensirion_i2c_init(void)
+{
+    printf("[DEBUG] Initializing I2C hardware...\n");
+
+    static i2c_device_t sht4x_device = {
+        .port = I2C_PORT_1,
+        .address = 0x44
+    };
 
     // Register the I2C driver with the system
     // Path may be different, check when device connected to computer
-    driver_add("/dev/i2c", NULL, &i2c_device_devops);
+    driver_add("/dev/i2c", &sht4x_device, &i2c_device_devops);
 }
 
 /**
  * Release all resources initialized by sensirion_i2c_init().
  */
-void sensirion_i2c_release(void) {
+void sensirion_i2c_release(void)
+{
     // IMPLEMENT or leave empty if no resources need to be freed
 }
 
@@ -88,9 +96,32 @@ void sensirion_i2c_release(void) {
  * @param count   number of bytes to read from I2C and store in the buffer
  * @returns 0 on success, error code otherwise
  */
-int8_t sensirion_i2c_read(uint8_t address, uint8_t* data, uint16_t count) {
-    // IMPLEMENT
-    return STATUS_FAIL;
+int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
+{
+    if (i2c_device_devops.ioctl == NULL)
+    {
+        printf("[ERROR] I2C ioctl function is NULL! The I2C driver may not be registered.\n");
+        return -1;
+    }
+
+    i2c_transfer_t transfer;
+
+    transfer.addr.len = 1;                  // Address length is 1 byte
+    transfer.addr.data = &address;          // Register address for read
+
+    transfer.value.len = count;             // Number of bytes to read
+    transfer.value.data = (uint8_t *)data;  // Pointer to buffer
+
+    // Execute read operation via ioctl
+    long ret = i2c_device_devops.ioctl(0, NULL, I2C_READ_REG, (void*)&transfer);
+
+    if (ret != 0)
+    {
+        printf("[ERROR] I2C Read Failed for address 0x%02X: %ld\n", address, ret);
+        return -1;
+    }
+
+    return (int8_t)ret;
 }
 
 /**
@@ -104,10 +135,32 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t* data, uint16_t count) {
  * @param count   number of bytes to read from the buffer and send over I2C
  * @returns 0 on success, error code otherwise
  */
-int8_t sensirion_i2c_write(uint8_t address, const uint8_t* data,
-                           uint16_t count) {
-    // IMPLEMENT
-    return STATUS_FAIL;
+int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
+{
+    if (i2c_device_devops.ioctl == NULL)
+    {
+        printf("[ERROR] I2C ioctl function is NULL! The I2C driver may not be registered.\n");
+        return -1;
+    }
+
+    i2c_transfer_t transfer;
+
+    transfer.addr.len = 1;                  // Address length is 1 byte
+    transfer.addr.data = &address;          // Register address for write
+
+    transfer.value.len = count;             // Number of bytes to write
+    transfer.value.data = (uint8_t *)data;  // Pointer to buffer
+
+    // Execute write operation via ioctl
+    long ret = i2c_device_devops.ioctl(0, NULL, I2C_WRITE_REG, (void*)&transfer);
+
+    if (ret != 0)
+    {
+        printf("[ERROR] I2C Write Failed for address 0x%02X: %ld\n", address, ret);
+        return -1;
+    }
+
+    return (int8_t)ret;
 }
 
 /**
@@ -118,6 +171,7 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t* data,
  *
  * @param useconds the sleep time in microseconds
  */
-void sensirion_sleep_usec(uint32_t useconds) {
+void sensirion_sleep_usec(uint32_t useconds)
+{
     // IMPLEMENT
 }
