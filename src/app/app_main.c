@@ -13,6 +13,7 @@
 #include "sensor_message.h"
 #include "log.h"
 #include "sht4x/sht4x.h"
+#include "sensirion_i2c.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
@@ -25,36 +26,50 @@
 LOG_LEVEL_INIT(LOG_LEVEL_INFO);
 
 
-static void send_sht45_data(void);
+static void send_sht4x_data(void);
 
 int app_main(int argc, const char *argv[]) {
-    (void)argc;
-    (void)argv;
+    (void) argc;
+    (void) argv;
 
-    // Initialize Rodeo system
+    INFO("%s", "Initializing Rodeo IoT System...");
     rodeo_init("demo");
 
-    while (1) {
-        send_sht45_data();
-        INFO("Example log %lld\n", (long long int) time(0));
+    INFO("%s", "Initializing I2C communication...");
+    sensirion_i2c_init();
+
+    INFO("%s", "Probing SHT4x sensor...");
+    if (sht4x_probe() != 0) {
+        ERR("%s", "SHT4x sensor not detected! Exiting...");
+        return -1;
+    }
+
+    INFO("%s", "SHT4x sensor detected. Starting data collection...");
+
+    while(1){
+        send_sht4x_data();
         sleep(5);
     }
 
     return 0;
 }
 
-static void send_sht45_data(void) {
-    int32_t sht_temp, sht_hum;
+static void send_sht4x_data(void) {
+    int32_t sht_temp;
+    int32_t sht_hum;
 
-    if (sht4x_measure_blocking_read(&sht_temp, &sht_hum) == 0) {
-        INFO("SHT45 Temp: %.2f°C, Humidity: %.2f%%\n", (float)sht_temp / 1000, (float)sht_hum / 1000);
+    if(sht4x_measure_blocking_read(&sht_temp, &sht_hum) == 0) {
+        float temp_cel = (float)sht_temp / 1000.0;
+        float hum_percent = (float)sht_hum / 1000.0;
+
+        INFO("SHT4x Sensor Data: Temperature: %.2f Celsius, Humidity: %.2f%%", temp_cel, hum_percent);
+
+        float sht_data[2] = {temp_cel, hum_percent};
+
+        if(send_sensor_msg_float_array_by_id(SENSOR_ID_ENV, sht_data, 2) != 0) {
+            ERR("%s", "Failed to send SHT4x sensor data!");
+        }
     } else {
-        ERR("%s", "SHT45 read failed\n");
-        return;
-    }
-
-    float sht_data[2] = {sht_temp, sht_hum};
-    if (send_sensor_msg_float_array_by_id(SENSOR_ID_ENV, sht_data, 2) != 0) {
-        ERR("%s", "Failed to send SHT45 sensor data\n");
+        ERR("%s", "SHT4x measurement failed!");
     }
 }
