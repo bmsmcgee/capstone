@@ -33,6 +33,8 @@
 #include "sensirion_common.h"
 #include "sensirion_i2c.h"
 #include "drivers/i2c_driver.h"
+#include <stdio.h>
+#include <unistd.h>
 
 /*
  * INSTRUCTIONS
@@ -65,7 +67,7 @@ void sensirion_i2c_init(void) {
     printf("[DEBUG] Initializing I2C hardware for SHT45...\n");
 
     // Register the I2C driver with the system
-    // Path may be different
+    // Path may be different, check when device connected to computer
     driver_add("/dev/i2c", NULL, &i2c_device_devops);
 }
 
