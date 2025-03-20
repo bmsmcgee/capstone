@@ -112,18 +112,8 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count, ...)
     transfer.value.len = count;             // Number of bytes to read
     transfer.value.data = (uint8_t *)data;  // Pointer to buffer
 
-    // Start variadic argument handling
-    va_list args;
-    va_start(args, count);
-
-    // Extract arguments: since we know we're passing `i2c_transfer_t*`
-    i2c_transfer_t* transfer_ptr = va_arg(args, i2c_transfer_t*);
-
-    // Cleanup variadic list
-    va_end(args);
-
-    // Execute ioctl with the variadic argument
-    long ret = i2c_device_devops.ioctl(0, NULL, I2C_READ_REG, (void*)transfer_ptr);
+    // Perform write operation
+    long ret = i2c_device_devops.read(0, NULL, (char*)&transfer, sizeof(transfer));
 
     if (ret != 0)
     {
@@ -145,7 +135,7 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count, ...)
  * @param count   number of bytes to read from the buffer and send over I2C
  * @returns 0 on success, error code otherwise
  */
-int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count, ...)
+int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 {
     if (i2c_device_devops.ioctl == NULL)
     {
@@ -161,20 +151,8 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count,
     transfer.value.len = count;             // Number of bytes to write
     transfer.value.data = (uint8_t *)data;  // Pointer to buffer
 
-    long ret;
-
-    // Start variadic argument handling
-    va_list args;
-    va_start(args, count);
-
-    // Extract arguments: since we know we're passing `i2c_transfer_t*`
-    i2c_transfer_t* transfer_ptr = va_arg(args, i2c_transfer_t*);
-
-    // Cleanup variadic list
-    va_end(args);
-
-    // Execute ioctl with the variadic argument
-    long ret = i2c_device_devops.ioctl(0, NULL, I2C_WRITE_REG, (void*)transfer_ptr);
+    // Perform write operation
+    long ret = i2c_device_devops.write(0, NULL, (const char*)&transfer, sizeof(transfer));
 
 
     if (ret != 0)
