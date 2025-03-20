@@ -14,5 +14,5 @@ add_compile_options(
     -DORG_NAME="${ORG_NAME}"
 )
 
-add_subdirectory("app")
+add_subdirectory("temp_hum")
 
