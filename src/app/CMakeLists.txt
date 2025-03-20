@@ -9,7 +9,6 @@ add_executable(${APP_NAME}
 
 target_link_libraries(${APP_NAME} PRIVATE
     ${RodeoIot_LIBRARIES}
-    sensirion_hw_i2c_implementation.c
 )
 
 target_include_directories(${APP_NAME} PRIVATE
