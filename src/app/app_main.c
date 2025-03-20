@@ -49,12 +49,12 @@ static void send_sht45_data(void) {
     if (sht4x_measure_blocking_read(&sht_temp, &sht_hum) == 0) {
         INFO("SHT45 Temp: %.2f°C, Humidity: %.2f%%\n", (float)sht_temp / 1000, (float)sht_hum / 1000);
     } else {
-        ERR("SHT45 read failed\n");
+        ERR("SHT45 read failed\n", 0);
         return;
     }
 
     float sht_data[2] = {sht_temp, sht_hum};
     if (send_sensor_msg_float_array_by_id(SENSOR_ID_ENV, sht_data, 2) != 0) {
-        ERR("Failed to send SHT45 sensor data\n");
+        ERR("Failed to send SHT45 sensor data\n", 0);
     }
 }
