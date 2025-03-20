@@ -4,12 +4,12 @@ add_executable(${APP_NAME}
     app_main.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../embedded-sht/sht4x/sht4x.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../embedded-sht/embedded-common/sensirion_common.c
-    sht4x_driver.c
+    sensirion_hw_i2c_implementation.c
 )
 
 target_link_libraries(${APP_NAME} PRIVATE
     ${RodeoIot_LIBRARIES}
-    sht4x_driver.c
+    sensirion_hw_i2c_implementation.c
 )
 
 target_include_directories(${APP_NAME} PRIVATE
