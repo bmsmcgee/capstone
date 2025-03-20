@@ -17,6 +17,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <time.h>
+
+
 
 LOG_LEVEL_INIT(LOG_LEVEL_INFO);
 
@@ -28,7 +31,7 @@ int app_main(int argc, const char *argv[])
     (void)argv;
 
     /* Initialize the Rodeo subsystem */
-    rodeo_init(ORG_NAME);
+    // rodeo_init(ORG_NAME);
 
     /* Initialize the environmental sensor */
     bme688_init();
@@ -36,7 +39,7 @@ int app_main(int argc, const char *argv[])
     while (1) {
         send_env_data();
         INFO("Example log %lld\n", (long long int) time(0));
-        sleep(30);
+        sleep(5);
     }
 
     return 0;
@@ -48,4 +51,19 @@ static void send_env_data(void)
     bme688_get_measurements(&env);
     float envdata[4] = { env.gas_resistance, env.humidity, env.pressure, env.temperature};
     send_sensor_msg_float_array_by_id(SENSOR_ID_ENV, envdata, 4);
+    printf("%f\n", env.temperature);
 }
+
+// int app_main(int argc, const char *argv[]) {
+//     (void)argc;
+//     (void)argv;
+
+
+//     printf("Firmware Started! Output to minicom confirmed.\n");
+
+//     while(1) {
+//         printf("Running... Timestamp: %lld\n", (long long)time(NULL));
+//         sleep(2);
+//     }
+//     return 0;
+// }

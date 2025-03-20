@@ -14,7 +14,8 @@ add_compile_options(
     -DORG_NAME="${ORG_NAME}"
 )
 
-add_subdirectory("env_sensor_demo")
-add_subdirectory("ir_sensor_demo")
-add_subdirectory("audio_input_demo")
+# add_subdirectory("env_sensor_demo")
+# add_subdirectory("ir_sensor_demo")
+# add_subdirectory("audio_input_demo")
+add_subdirectory("app")
 

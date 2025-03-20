@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": 
+      {
+        "name": "Target: pain",
+        "executable": "/home/parallels/Desktop/capstone/src/build/debug/env_sensor_demo/rodeo-env-sensor-example.axf",
+        "request": "launch",
+        "type": "cortex-debug",
+        "device": "MIMXRT1021XXX5A",
+        "runToEntryPoint": "main",
+        "showDevDebugOutput": "none",
+        "servertype": "jlink",
+        "gdbPath": "/usr/bin/gdb-multiarch"
+      }
+  }
