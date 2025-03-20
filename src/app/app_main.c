@@ -11,7 +11,6 @@
 
 #include "rodeo.h"
 #include "sensor_message.h"
-#include "log.h"
 #include "sht4x/sht4x.h"
 #include "sensirion_i2c.h"
 #include <stdio.h>
