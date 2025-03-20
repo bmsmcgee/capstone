@@ -99,12 +99,6 @@ void sensirion_i2c_release(void)
  */
 int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
 {
-    if (i2c_device_devops.ioctl == NULL)
-    {
-        printf("[ERROR] I2C ioctl function is NULL! The I2C driver may not be registered.\n");
-        return -1;
-    }
-
     i2c_transfer_t transfer;
 
     transfer.addr.len = 1;                  // Address length is 1 byte
@@ -138,12 +132,6 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
  */
 int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 {
-    if (i2c_device_devops.ioctl == NULL)
-    {
-        printf("[ERROR] I2C ioctl function is NULL! The I2C driver may not be registered.\n");
-        return -1;
-    }
-
     i2c_transfer_t transfer;
 
     transfer.addr.len = 1;                  // Address length is 1 byte
