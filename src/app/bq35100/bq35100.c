@@ -44,3 +44,18 @@ int16_t bq35100_read_byte(uint8_t reg_addr) {
     int16_t ret = bq35100_read_register(reg_addr, &buffer, 1);
     return (ret == 0) ? buffer : ret;
 }
+
+int16_t bq35100_read_word(uint8_t reg_addr) {
+    uint8_t buffer[2];
+    int16_t ret = bq35100_read_register(reg_addr, buffer, 2);
+    if (ret != 0) {
+        return ret;
+    }
+
+    return (buffer[1] << 8) | buffer[0];    // Convert to 16-bit little-endian
+}
+
+int16_t bq35100_write_byte(uint8_t reg_addr, uint8_t value) {
+    return bq35100_write_register(reg_addr, &value, 1);
+}
+
