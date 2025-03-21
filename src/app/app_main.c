@@ -55,7 +55,9 @@ int app_main(int argc, const char *argv[]) {
 
     return 0;
 }
-
+/*
+ * EVERY FUNCTION AFTER THIS POINT WILL EVENTUALLY BE CONSOLIDATED INTO ONE FUNCTION TO SEND ALL VARIABLES TO CLOUD THROUGH MQTT
+*/
 static void send_sht4x_data(void) {
     int32_t sht_temp;
     int32_t sht_hum;
