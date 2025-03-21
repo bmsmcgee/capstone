@@ -74,9 +74,15 @@ void sensirion_i2c_init(void)
         .address = 0x44
     };
 
+    static i2c_device_t bq35100_device = {
+        .port = I2C_PORT_1,
+        .address = 0x55
+    };
+
     // Register the I2C driver with the system
     // Path may be different, check when device connected to computer
     driver_add("/dev/i2c", &sht4x_device, &i2c_device_devops);
+    driver_add("/dev/i2c", &bq35100_device, &i2c_device_devops);
 }
 
 /**
