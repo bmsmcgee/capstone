@@ -28,23 +28,57 @@
 #define BQ35100_REG_CAL_TEMP        0x7E    // Calibration Temperature (2 bytes, K)
 
 /**
- * @brief Reads a register from the BQ35100 fuel gauge
+ * @brief Reads data from a BQ35100 register over I²C.
  *
- * @param address   7-bit address to read from
- * @param data      pointer to the buffer where the data is to be stored
- * @param count     number of bytes to read
- * @return int16_t 0 on success, error code otherwise
+ * @param reg_addr Register address to read from.
+ * @param buffer Pointer to store the read data.
+ * @param len Number of bytes to read.
+ * @return int16_t 0 on success, negative error code otherwise.
  */
-int16_t bq35100_read_register(uint8_t address, uint8_t *data, uint16_t count);
+int16_t bq35100_read_register(uint8_t reg_addr, uint8_t *buffer, uint16_t len);
 
 /**
- * @brief Writes to a register from the BQ35100 fuel gauge
+ * @brief Writes data to a BQ35100 register over I²C.
  *
- * @param address   7-bit address to write to
- * @param data      pointer to the data to be written
- * @param count     number of bytes to write
- * @return int16_t 0 on success, error code otherwise
+ * @param reg_addr Register address to write to.
+ * @param data Pointer to the data to be written.
+ * @param len Number of bytes to write.
+ * @return int16_t 0 on success, negative error code otherwise.
  */
-int16_t bq35100_write_register(uint8_t address, uint8_t *data, uint16_t count);
+int16_t bq35100_write_register(uint8_t reg_addr, const uint8_t *data, uint16_t len);
+
+/**
+ * @brief Reads a single byte from a BQ35100 register.
+ *
+ * @param reg_addr Register address to read from.
+ * @return int16_t Register value (0-255) on success, negative error code otherwise.
+ */
+int16_t bq35100_read_byte(uint8_t reg_addr);
+
+/**
+ * @brief Reads a 16-bit word (2 bytes) from a BQ35100 register.
+ *
+ * @param reg_addr Register address to read from.
+ * @return int16_t Register value on success, negative error code otherwise.
+ */
+int16_t bq35100_read_word(uint8_t reg_addr);
+
+/**
+ * @brief Writes a single byte to a BQ35100 register.
+ *
+ * @param reg_addr Register address to write to.
+ * @param value Value to write.
+ * @return int16_t 0 on success, negative error code otherwise.
+ */
+int16_t bq35100_write_byte(uint8_t reg_addr, uint8_t value);
+
+/**
+ * @brief Writes a 16-bit word (2 bytes) to a BQ35100 register.
+ *
+ * @param reg_addr Register address to write to.
+ * @param value 16-bit value to write.
+ * @return int16_t 0 on success, negative error code otherwise.
+ */
+int16_t bq35100_write_word(uint8_t reg_addr, uint16_t value);
 
 #endif /* bq35100 */
