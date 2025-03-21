@@ -38,3 +38,9 @@ int16_t bq35100_write_register(uint8_t reg_addr, const uint8_t *data, uint16_t l
 
     return ret;
 }
+
+int16_t bq35100_read_byte(uint8_t reg_addr) {
+    uint8_t buffer;
+    int16_t ret = bq35100_read_register(reg_addr, &buffer, 1);
+    return (ret == 0) ? buffer : ret;
+}
