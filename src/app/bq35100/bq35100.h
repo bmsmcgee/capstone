@@ -88,7 +88,7 @@ int16_t bq35100_write_word(uint8_t reg_addr, uint16_t value);
  * @param current Displays the current of the battery
  * @param temp Displays the internal temperature of the battery
  * @param soh Displays the State of Health of the battery
- * @return 0 on success
+ * @return 0 on success, negative error code otherwise.
  */
 int16_t bq35100_read_all_blocking(int16_t *voltage, int16_t *current, float *temp, int16_t *soh);
 
