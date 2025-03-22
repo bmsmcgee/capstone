@@ -130,3 +130,11 @@ int16_t bq35100_read_all_blocking(int16_t *voltage, int16_t *current, float *tem
 
     return 0;
 }
+
+int16_t bq35100_send_subcommand(uint16_t subcommand) {
+    uint8_t cmd_data[2];
+    cmd_data[0] = subcommand & 0xFF;        // LSB
+    cmd_data[1] = (subcommand >> 8) & 0xFF; // MSB
+
+    return bq35100_write_register(BQ35100_REG_CONTROL, cmd_data, 2);
+}

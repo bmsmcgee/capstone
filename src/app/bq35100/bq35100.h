@@ -27,6 +27,10 @@
 #define BQ35100_REG_CAL_VOLTAGE     0x7C    // Calibration Voltage (2 bytes, mV)
 #define BQ35100_REG_CAL_TEMP        0x7E    // Calibration Temperature (2 bytes, K)
 
+// Subcommands
+#define BQ35100_SUB_GAUGE_START     0x0011  // Instruct fuel gauge to enter ACTIVE mode
+#define BQ35100_SUB_GAUGE_STOP      0x0012  // Instruct fuel gauge to ext ACTIVE mode
+
 /**
  * @brief Reads data from a BQ35100 register over I²C.
  *
@@ -91,5 +95,13 @@ int16_t bq35100_write_word(uint8_t reg_addr, uint16_t value);
  * @return 0 on success, negative error code otherwise.
  */
 int16_t bq35100_read_all_blocking(int16_t *voltage, int16_t *current, float *temp, int16_t *soh);
+
+/**
+ * @brief Sends a control subcommand to the BQ35100.
+ *
+ * @param subcommand 16-bit command code (e.g., 0x0011 for GAUGE_START)
+ * @return int16_t 0 on success, negative on error
+ */
+int16_t bq35100_send_subcommand(uint16_t subcommand);
 
 #endif /* bq35100 */
