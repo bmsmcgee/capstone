@@ -5,7 +5,7 @@ add_executable(${APP_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../embedded-sht/sht4x/sht4x.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../../embedded-sht/embedded-common/sensirion_common.c
     i2c_implementation.c
-    bq35100/bq35100.c
+    # bq35100/bq35100.c
 )
 
 target_link_libraries(${APP_NAME} PRIVATE

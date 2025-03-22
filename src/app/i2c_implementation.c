@@ -175,5 +175,5 @@ void sensirion_sleep_usec(uint32_t useconds)
     req.tv_sec = useconds / 1000000;            // Convert microseconds to seconds
     req.tv_nsec = (useconds % 1000000) * 1000;  // Convert remainder to nanoseconds
 
-    clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
+    // clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
 }
