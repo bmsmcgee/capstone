@@ -107,8 +107,9 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
 {
     i2c_transfer_t transfer;
 
-    transfer.addr.len = 1;                  // Address length is 1 byte
-    transfer.addr.data = &address;          // Register address for read
+    // THIS MAY HAVE BEEN THE PROBLEM??
+    transfer.addr.len = 0;                  // Address length is 1 byte
+    transfer.addr.data = NULL;          // Register address for read
 
     transfer.value.len = count;             // Number of bytes to read
     transfer.value.data = (uint8_t *)data;  // Pointer to buffer
@@ -140,8 +141,9 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 {
     i2c_transfer_t transfer;
 
-    transfer.addr.len = 1;                  // Address length is 1 byte
-    transfer.addr.data = &address;          // Register address for write
+    // THIS MAY HAVE BEEN THE PROBLEM????
+    transfer.addr.len = 0;                  // Address length is 1 byte
+    transfer.addr.data = NULL;          // Register address for write
 
     transfer.value.len = count;             // Number of bytes to write
     transfer.value.data = (uint8_t *)data;  // Pointer to buffer
