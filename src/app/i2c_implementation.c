@@ -169,11 +169,11 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
  *
  * @param useconds the sleep time in microseconds
  */
-void sensirion_sleep_usec(uint32_t useconds)
-{
-    struct timespec req;
-    req.tv_sec = useconds / 1000000;            // Convert microseconds to seconds
-    req.tv_nsec = (useconds % 1000000) * 1000;  // Convert remainder to nanoseconds
+// void sensirion_sleep_usec(uint32_t useconds)
+// {
+//     struct timespec req;
+//     req.tv_sec = useconds / 1000000;            // Convert microseconds to seconds
+//     req.tv_nsec = (useconds % 1000000) * 1000;  // Convert remainder to nanoseconds
 
-    // clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
-}
+//     // clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
+// }
