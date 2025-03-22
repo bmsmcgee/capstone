@@ -81,6 +81,15 @@ int16_t bq35100_write_byte(uint8_t reg_addr, uint8_t value);
  */
 int16_t bq35100_write_word(uint8_t reg_addr, uint16_t value);
 
+/**
+ * @brief Gets data about battery from fuel gauge.
+ *
+ * @param voltage Displays the voltage of the battery
+ * @param current Displays the current of the battery
+ * @param temp Displays the internal temperature of the battery
+ * @param soh Displays the State of Health of the battery
+ * @return 0 on success
+ */
 int16_t bq35100_read_all_blocking(int16_t *voltage, int16_t *current, float *temp, int16_t *soh);
 
 #endif /* bq35100 */
