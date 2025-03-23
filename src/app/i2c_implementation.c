@@ -74,15 +74,15 @@ void sensirion_i2c_init(void)
         .address = 0x44
     };
 
-    static i2c_device_t bq35100_device = {
-        .port = I2C_PORT_1,
-        .address = 0x55
-    };
+    // static i2c_device_t bq35100_device = {
+    //     .port = I2C_PORT_1,
+    //     .address = 0x55
+    // };
 
     // Register the I2C driver with the system
     // Path may be different, check when device connected to computer
-    driver_add("/dev/i2c", &sht4x_device, &i2c_device_devops);
-    driver_add("/dev/i2c", &bq35100_device, &i2c_device_devops);
+    driver_add("/dev/i2c*", &sht4x_device, &i2c_device_devops);
+    // driver_add("/dev/i2c", &bq35100_device, &i2c_device_devops);
 }
 
 /**
@@ -108,8 +108,8 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
     i2c_transfer_t transfer;
 
     // THIS MAY HAVE BEEN THE PROBLEM??
-    transfer.addr.len = 0;                  // Address length is 1 byte
-    transfer.addr.data = NULL;          // Register address for read
+    transfer.addr.len = 0;                  
+    transfer.addr.data = NULL;          
 
     transfer.value.len = count;             // Number of bytes to read
     transfer.value.data = (uint8_t *)data;  // Pointer to buffer
@@ -142,8 +142,8 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
     i2c_transfer_t transfer;
 
     // THIS MAY HAVE BEEN THE PROBLEM????
-    transfer.addr.len = 0;                  // Address length is 1 byte
-    transfer.addr.data = NULL;          // Register address for write
+    transfer.addr.len = 0;                  
+    transfer.addr.data = NULL;          
 
     transfer.value.len = count;             // Number of bytes to write
     transfer.value.data = (uint8_t *)data;  // Pointer to buffer
