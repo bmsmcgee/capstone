@@ -81,7 +81,7 @@ void sensirion_i2c_init(void)
 
     // Register the I2C driver with the system
     // Path may be different, check when device connected to computer
-    driver_add("/dev/i2c*", &sht4x_device, &i2c_device_devops);
+    driver_add("/dev/i2c-1", &sht4x_device, &i2c_device_devops);
     // driver_add("/dev/i2c", &bq35100_device, &i2c_device_devops);
 }
 
@@ -112,7 +112,7 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
     transfer.addr.data = NULL;          
 
     transfer.value.len = count;             // Number of bytes to read
-    transfer.value.data = (uint8_t *)data;  // Pointer to buffer
+    transfer.value.data = data;  // Pointer to buffer
 
     // Perform write operation
     long ret = i2c_device_devops.read(0, NULL, (char*)&transfer, sizeof(transfer));
@@ -123,7 +123,7 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
         return -1;
     }
 
-    return (int8_t)ret;
+    return 0;
 }
 
 /**
@@ -142,11 +142,11 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
     i2c_transfer_t transfer;
 
     // THIS MAY HAVE BEEN THE PROBLEM????
-    transfer.addr.len = 0;                  
-    transfer.addr.data = NULL;          
+    transfer.addr.len = count;                  
+    transfer.addr.data = (uint8_t *)data;          
 
-    transfer.value.len = count;             // Number of bytes to write
-    transfer.value.data = (uint8_t *)data;  // Pointer to buffer
+    transfer.value.len = 0;             // Number of bytes to write
+    transfer.value.data = NULL;  // Pointer to buffer
 
     // Perform write operation
     long ret = i2c_device_devops.write(0, NULL, (const char*)&transfer, sizeof(transfer));
@@ -158,7 +158,7 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
         return -1;
     }
 
-    return (int8_t)ret;
+    return 0;
 }
 
 /**
@@ -169,11 +169,11 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
  *
  * @param useconds the sleep time in microseconds
  */
-// void sensirion_sleep_usec(uint32_t useconds)
-// {
-//     struct timespec req;
-//     req.tv_sec = useconds / 1000000;            // Convert microseconds to seconds
-//     req.tv_nsec = (useconds % 1000000) * 1000;  // Convert remainder to nanoseconds
+void sensirion_sleep_usec(uint32_t useconds)
+{
+    struct timespec req;
+    req.tv_sec = useconds / 1000000;            // Convert microseconds to seconds
+    req.tv_nsec = (useconds % 1000000) * 1000;  // Convert remainder to nanoseconds
 
-//     // clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
-// }
+    clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
+}
