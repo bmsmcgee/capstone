@@ -90,32 +90,3 @@ static void send_sht4x_data(void)
         ERR("%s", "SHT4x measurement failed!");
     }
 }
-
-// static void send_bq35100_data(void)
-// {
-//     int16_t voltage;
-//     int16_t current;
-//     float temp;
-//     int16_t soh;
-
-//     if (bq35100_read_all_blocking(&voltage, &current, &temp, &soh) == 0)
-//     {
-//         INFO("BQ35100 Fuel Gauge Data: Voltage: %d mV, Current: %d mA, Temp: %.2f °C, SOH: %d%%",
-//              voltage, current, temp, soh);
-
-//         float fuel_data[4] = {
-//             (float)voltage,
-//             (float)current,
-//             temp,
-//             (float)soh};
-
-//         if (send_sensor_msg_float_array_by_id(SENSOR_ID_ENV, fuel_data, 4) != 0)
-//         {
-//             ERR("%s", "Failed to send BQ35100 sensor data!");
-//         }
-//     }
-//     else
-//     {
-//         ERR("%s", "BQ35100 fuel gauge read failed!");
-//     }
-// }
