@@ -33,33 +33,13 @@
 #include "sensirion_common.h"
 #include "sensirion_i2c.h"
 #include "drivers/i2c_driver.h"
+#include <sys/ioctl.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
 
-/*
- * INSTRUCTIONS
- * ============
- *
- * Implement all functions where they are marked as IMPLEMENT.
- * Follow the function specification in the comments.
- */
+int fd = -1;
 
-/**
- * Select the current i2c bus by index.
- * All following i2c operations will be directed at that bus.
- *
- * THE IMPLEMENTATION IS OPTIONAL ON SINGLE-BUS SETUPS (all sensors on the same
- * bus)
- *
- * @param bus_idx   Bus index to select
- * @returns         0 on success, an error code otherwise
- */
-int16_t sensirion_i2c_select_bus(uint8_t bus_idx)
-{
-    // IMPLEMENT or leave empty if all sensors are located on one single bus
-    return STATUS_FAIL;
-}
 
 /**
  * Initialize all hard- and software components that are needed for the I2C
@@ -67,7 +47,7 @@ int16_t sensirion_i2c_select_bus(uint8_t bus_idx)
  */
 void sensirion_i2c_init(void)
 {
-    printf("[DEBUG] Initializing I2C hardware...\n");
+    printf("[DEBUG] Initializing I2C hardware...\n\n");
 
     static i2c_device_t sht4x_device = {
         .port = I2C_PORT_1,
@@ -81,7 +61,11 @@ void sensirion_i2c_init(void)
 
     // Register the I2C driver with the system
     // Path may be different, check when device connected to computer
-    driver_add("/dev/i2c-1", &sht4x_device, &i2c_device_devops);
+    driver_add("/dev/sht4x", &sht4x_device, &i2c_device_devops);
+    fd = i2c_device_devops.open(NULL, "/dev/sht4x", 0, 0);
+    if (fd != 0) {
+        printf("[ERROR] Failed to open /dev/sht4x\n\n");
+    }
     // driver_add("/dev/i2c", &bq35100_device, &i2c_device_devops);
 }
 
@@ -107,15 +91,15 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
 {
     i2c_transfer_t transfer;
 
-    // THIS MAY HAVE BEEN THE PROBLEM??
     transfer.addr.len = 0;                  
     transfer.addr.data = NULL;          
 
     transfer.value.len = count;             // Number of bytes to read
-    transfer.value.data = data;  // Pointer to buffer
+    transfer.value.data = data;             // Pointer to buffer
 
     // Perform write operation
-    long ret = i2c_device_devops.read(0, NULL, (char*)&transfer, sizeof(transfer));
+    // long ret = i2c_device_devops.read(0, NULL, (char*)&transfer, sizeof(transfer));
+    long ret = ioctl(fd, I2C_READ_REG, &transfer);
 
     if (ret != 0)
     {
@@ -141,16 +125,14 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 {
     i2c_transfer_t transfer;
 
-    // THIS MAY HAVE BEEN THE PROBLEM????
-    transfer.addr.len = count;                  
-    transfer.addr.data = (uint8_t *)data;          
+    transfer.addr.len = 0;                  
+    transfer.addr.data = NULL;          
 
-    transfer.value.len = 0;             // Number of bytes to write
-    transfer.value.data = NULL;  // Pointer to buffer
+    transfer.value.len = count;             // Number of bytes to write
+    transfer.value.data = (uint8_t *)data;             // Pointer to buffer
 
     // Perform write operation
-    long ret = i2c_device_devops.write(0, NULL, (const char*)&transfer, sizeof(transfer));
-
+    long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
 
     if (ret != 0)
     {
@@ -172,4 +154,13 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 void sensirion_sleep_usec(uint32_t useconds)
 {
     usleep(useconds);
+}
+void sensirion_sleep_usec(uint32_t useconds)
+{
+    // struct timespec req;
+    // req.tv_sec = useconds / 1000000;            // Convert microseconds to seconds
+    // req.tv_nsec = (useconds % 1000000) * 1000;  // Convert remainder to nanoseconds
+
+    // clock_nanosleep(CLOCK_MONOTONIC, 0, &req, NULL);
+    usleep(1000);
 }

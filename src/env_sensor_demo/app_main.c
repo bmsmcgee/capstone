@@ -34,9 +34,13 @@ int app_main(int argc, const char *argv[])
     // rodeo_init(ORG_NAME);
 
     /* Initialize the environmental sensor */
+    printf("Initialization of bme");
     bme688_init();
+
+    int count = 0;
     
     while (1) {
+        printf("this is the %d time the loop has passed", count++);
         send_env_data();
         INFO("Example log %lld\n", (long long int) time(0));
         sleep(5);

@@ -32,7 +32,7 @@ int app_main(int argc, const char *argv[])
     (void)argv;
 
     INFO("%s", "Initializing Rodeo IoT System...");
-    rodeo_init("demo");
+    // rodeo_init("demo");
 
     INFO("%s", "Initializing I2C communication...");
     sensirion_i2c_init();
