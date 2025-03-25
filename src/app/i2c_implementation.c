@@ -34,7 +34,7 @@
 #include "sensirion_i2c.h"
 #include "drivers/i2c_driver.h"
 #include "sensor_message.h"
-#include "sys/ioctl.h"
+#include "sys/ioctl.h"  // from sdk
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
@@ -42,8 +42,6 @@
 #include <stdarg.h>
 
 LOG_LEVEL_INIT(LOG_LEVEL_INFO);
-
-#define I2C_SLAVE 0x0703
 
 static int fd = -1;
 void* pd = NULL;
@@ -99,7 +97,6 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
     };
 
     // Perform read operation
-    // long ret = i2c_device_devops.ioctl(fd, pd, I2C_READ_REG, &transfer);
     long ret = i2c_device_devops.ioctl(fd, pd, I2C_READ_REG, &transfer);
 
     if (ret < 0)
