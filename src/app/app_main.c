@@ -32,7 +32,7 @@ int app_main(int argc, const char *argv[])
     (void)argv;
 
     INFO("%s", "Initializing Rodeo IoT System...");
-    rodeo_init("demo");
+    // rodeo_init("demo");
 
     INFO("%s", "Initializing I2C communication...");
     sensirion_i2c_init();
@@ -46,10 +46,10 @@ int app_main(int argc, const char *argv[])
 
     // INFO("%s", "Triggering BQ35100 fuel gauge to start...");
     // if (bq35100_send_subcommand(BQ35100_SUB_GAUGE_START) != 0)
-    {
-        ERR("%s", "Failed to trigger BQ35100 into ACTIVE mode.");
-        return -1;
-    }
+    // {
+    //     ERR("%s", "Failed to trigger BQ35100 into ACTIVE mode.");
+    //     return -1;
+    // }
 
     INFO("%s", "Sensors detected. Starting data collection...");
 

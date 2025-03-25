@@ -15,4 +15,4 @@ add_compile_options(
 )
 
 add_subdirectory("app")
-
+add_subdirectory("env_sensor_demo")
