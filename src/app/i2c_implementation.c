@@ -120,10 +120,13 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
  */
 int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 {
+
+    uint8_t addr_byte = address;
+
     i2c_transfer_t transfer ={
         .addr = {
-            .len = 0,
-            .data = NULL
+            .len = 1,
+            .data = &addr_byte
         },
         .value = {
             .len = count,
