@@ -60,10 +60,10 @@ void sensirion_i2c_init(void)
 
     INFO("device->open = %p", i2c_device_devops.open);
 
-    driver_add("/dev/ic2-1", &sht4x_device, &i2c_device_devops);
+    driver_add("/dev/i2c-1", &sht4x_device, &i2c_device_devops);
 
 
-    fd = i2c_device_devops.open(&sht4x_device, "/dev/sht4x", 0, 0);
+    fd = i2c_device_devops.open(&sht4x_device, "/dev/i2c-1", 0, 0);
     printf("i2c_device_devops.open() returned fd = %d", fd);
     if (fd < 0) {
         ERR("%s", "[ERROR] Failed to open /dev/sht4x");
@@ -98,7 +98,7 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
     // long ret = i2c_device_devops.read(0, NULL, (char*)&transfer, sizeof(transfer));
     long ret = ioctl(fd, I2C_READ_REG, &transfer);
 
-    if (ret != 0)
+    if (ret < 0)
     {
         ERR("[ERROR] I2C Read Failed for address 0x%02X: %ld\n", address, ret);
         return -1;
@@ -134,7 +134,7 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
     // Perform write operation
     long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
 
-    if (ret != 0)
+    if (ret < 0)
     {
         ERR("[ERROR] I2C Write Failed for address 0x%02X: %ld\n", address, ret);
         return -1;
