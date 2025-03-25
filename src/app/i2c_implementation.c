@@ -39,10 +39,15 @@
 #include <unistd.h>
 #include <time.h>
 #include <fcntl.h>
+#include <stdarg.h>
 
 LOG_LEVEL_INIT(LOG_LEVEL_INFO);
 
-int fd = -1;
+#define I2C_SLAVE 0x0703
+
+static int fd = -1;
+void* pd = NULL;
+
 
 /**
  * Initialize all hard- and software components that are needed for the I2C
@@ -57,14 +62,13 @@ void sensirion_i2c_init(void)
         .address = 0x44
     };
 
+    pd = (void*)&sht4x_device;
 
-    INFO("device->open = %p", i2c_device_devops.open);
-
-    driver_add("/dev/i2c-1", &sht4x_device, &i2c_device_devops);
+    driver_add("/dev/sht45", pd, &i2c_device_devops);
 
 
-    fd = i2c_device_devops.open(&sht4x_device, "/dev/i2c-1", 0, 0);
-    printf("i2c_device_devops.open() returned fd = %d", fd);
+    fd = i2c_device_devops.open(&sht4x_device, "/dev/sht45", 0, 0);
+
     if (fd < 0) {
         ERR("%s", "[ERROR] Failed to open /dev/sht4x");
     }
@@ -94,9 +98,9 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
         }
     };
 
-    // Perform write operation
-    // long ret = i2c_device_devops.read(0, NULL, (char*)&transfer, sizeof(transfer));
-    long ret = ioctl(fd, I2C_READ_REG, &transfer);
+    // Perform read operation
+    // long ret = i2c_device_devops.ioctl(fd, pd, I2C_READ_REG, &transfer);
+    long ret = sensirion_ioctl(fd, pd, I2C_READ_REG, &transfer);
 
     if (ret < 0)
     {
@@ -121,12 +125,10 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
 int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 {
 
-    uint8_t addr_byte = address;
-
     i2c_transfer_t transfer ={
         .addr = {
-            .len = 1,
-            .data = &addr_byte
+            .len = 0,
+            .data = NULL
         },
         .value = {
             .len = count,
@@ -135,7 +137,8 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
     };
 
     // Perform write operation
-    long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
+    // long ret = ioctl(fd, pd, I2C_WRITE_REG, &transfer);
+    long ret = sensirion_ioctl(fd, pd, I2C_WRITE_REG, &transfer);
 
     if (ret < 0)
     {
@@ -144,6 +147,7 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
     }
 
     return 0;
+
 }
 
 /**
@@ -157,5 +161,6 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 
 void sensirion_sleep_usec(uint32_t useconds)
 {
-    usleep(100);
+    usleep(useconds);
 }
+
