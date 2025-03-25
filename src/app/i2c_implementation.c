@@ -100,7 +100,7 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
 
     // Perform read operation
     // long ret = i2c_device_devops.ioctl(fd, pd, I2C_READ_REG, &transfer);
-    long ret = sensirion_ioctl(fd, pd, I2C_READ_REG, &transfer);
+    long ret = i2c_device_devops.ioctl(fd, pd, I2C_READ_REG, &transfer);
 
     if (ret < 0)
     {
@@ -138,7 +138,7 @@ int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
 
     // Perform write operation
     // long ret = ioctl(fd, pd, I2C_WRITE_REG, &transfer);
-    long ret = sensirion_ioctl(fd, pd, I2C_WRITE_REG, &transfer);
+    long ret = i2c_device_devops.ioctl(fd, pd, I2C_WRITE_REG, &transfer);
 
     if (ret < 0)
     {
