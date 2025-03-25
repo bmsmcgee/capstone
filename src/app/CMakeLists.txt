@@ -16,7 +16,6 @@ target_include_directories(${APP_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../../embedded-sht
     ${CMAKE_CURRENT_SOURCE_DIR}/../../embedded-sht/embedded-common
     ${CMAKE_CURRENT_SOURCE_DIR}/../../embedded-sht/sht-common
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../sdk/se-rodeo-iot-sdk/include/rodeo-iot
 )
 
 add_custom_command(
