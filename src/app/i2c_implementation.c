@@ -81,6 +81,41 @@ void sensirion_i2c_init(void)
 }
 
 /**
+ * Execute one write transaction on the I2C bus, sending a given number of
+ * bytes. The bytes in the supplied buffer must be sent to the given address. If
+ * the slave device does not acknowledge any of the bytes, an error shall be
+ * returned.
+ *
+ * @param address 7-bit I2C address to write to
+ * @param data    pointer to the buffer containing the data to write
+ * @param count   number of bytes to read from the buffer and send over I2C
+ * @returns 0 on success, error code otherwise
+ */
+int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count) {
+
+    i2c_transfer_t transfer = {
+        .addr = {
+            .len = 0,
+            .data = NULL
+        },
+        .value = {
+            .len = count,
+            .data = (uint8_t*)data
+        }
+    };
+
+    // long ret = i2c_device_devops.write(fd, &sht4x_device, (const char*)&transfer, sizeof(transfer));
+    long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
+
+    if (ret < 0) {
+        perror("direct write failed");
+        return -2;
+    }
+
+    return 0;
+}
+
+/**
  * Execute one read transaction on the I2C bus, reading a given number of bytes.
  * If the device does not acknowledge the read command, an error shall be
  * returned.
@@ -117,40 +152,7 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
     return 0;
 }
 
-/**
- * Execute one write transaction on the I2C bus, sending a given number of
- * bytes. The bytes in the supplied buffer must be sent to the given address. If
- * the slave device does not acknowledge any of the bytes, an error shall be
- * returned.
- *
- * @param address 7-bit I2C address to write to
- * @param data    pointer to the buffer containing the data to write
- * @param count   number of bytes to read from the buffer and send over I2C
- * @returns 0 on success, error code otherwise
- */
-int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count) {
 
-    i2c_transfer_t transfer = {
-        .addr = {
-            .len = 0,
-            .data = NULL
-        },
-        .value = {
-            .len = count,
-            .data = (uint8_t*)data
-        }
-    };
-
-    // long ret = i2c_device_devops.write(fd, &sht4x_device, (const char*)&transfer, sizeof(transfer));
-    long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
-
-    if (ret < 0) {
-        perror("direct write failed");
-        return -2;
-    }
-
-    return 0;
-}
 /**
  * Sleep for a given number of microseconds. The function should delay the
  * execution for at least the given time, but may also sleep longer.
