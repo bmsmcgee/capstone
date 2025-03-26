@@ -37,6 +37,12 @@ int app_main(int argc, const char *argv[])
     INFO("%s", "Initializing I2C communication...");
     sensirion_i2c_init();
 
+    // int fd = open("/dev/sht45", O_RDWR);
+    // if (fd < 0) {
+    //     ERR("%s", "Failed to open /dev/sht45");
+    //     return 0;
+    // }
+
     INFO("%s", "Probing SHT4x sensor...");
     if (sht4x_probe() != 0)
     {

@@ -34,18 +34,24 @@
 #include "sensirion_i2c.h"
 #include "drivers/i2c_driver.h"
 #include "sensor_message.h"
-#include "sys/ioctl.h"  // from sdk
+#include "sys/ioctl.h" // from sdk
 #include <stdio.h>
 #include <unistd.h>
 #include <time.h>
 #include <fcntl.h>
 #include <stdarg.h>
 
+#define SHT4X_I2C_ADDRESS 0x44
+#define SHT4X_CMD_SOFT_RESET 0x94
+
 LOG_LEVEL_INIT(LOG_LEVEL_INFO);
 
 static int fd = -1;
-void* pd = NULL;
 
+static i2c_device_t sht4x_device = {
+    .port = I2C_PORT_1,
+    .address = SHT4X_I2C_ADDRESS
+};
 
 /**
  * Initialize all hard- and software components that are needed for the I2C
@@ -53,25 +59,26 @@ void* pd = NULL;
  */
 void sensirion_i2c_init(void)
 {
-    INFO("%s", "[DEBUG] Initializing I2C hardware...");
+    driver_add("/dev/sht45", &sht4x_device, &i2c_device_devops);
 
-    static i2c_device_t sht4x_device = {
-        .port = I2C_PORT_1,
-        .address = 0x44
-    };
+    uint8_t cmd = SHT4X_CMD_SOFT_RESET;
 
-    pd = (void*)&sht4x_device;
-
-    driver_add("/dev/sht45", pd, &i2c_device_devops);
-
-
-    fd = i2c_device_devops.open(&sht4x_device, "/dev/sht45", 0, 0);
-
-    if (fd < 0) {
-        ERR("%s", "[ERROR] Failed to open /dev/sht4x");
+    // fd = i2c_device_devops.open(&sht4x_device, "/dev/sht45", 0, 0);
+    fd = open("/dev/sht45", O_RDWR);
+    if (fd < 0)
+    {
+        perror("failed to open file from device\n");
+        return;
     }
-}
 
+    int8_t ret = sensirion_i2c_write(SHT4X_I2C_ADDRESS, &cmd, 1);
+    if (ret < 0)
+    {
+        perror("SHT4x init failed\n");
+        return;
+    }
+    printf("SHT4x soft reset sent successfully.\n");
+}
 
 /**
  * Execute one read transaction on the I2C bus, reading a given number of bytes.
@@ -85,19 +92,21 @@ void sensirion_i2c_init(void)
  */
 int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
 {
-    i2c_transfer_t transfer ={
+    i2c_transfer_t transfer = {
         .addr = {
             .len = 0,
             .data = NULL
         },
         .value = {
-            .len = count,
+            .len = count, 
             .data = (uint8_t *)data
         }
     };
 
     // Perform read operation
-    long ret = i2c_device_devops.ioctl(fd, pd, I2C_READ_REG, &transfer);
+    // long ret = i2c_device_devops.ioctl(fd, pd, I2C_READ_REG, &transfer);
+    long ret = ioctl(fd, I2C_READ_REG, &transfer);
+    
 
     if (ret < 0)
     {
@@ -119,34 +128,29 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
  * @param count   number of bytes to read from the buffer and send over I2C
  * @returns 0 on success, error code otherwise
  */
-int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count)
-{
+int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count) {
 
-    i2c_transfer_t transfer ={
+    i2c_transfer_t transfer = {
         .addr = {
             .len = 0,
             .data = NULL
         },
         .value = {
             .len = count,
-            .data = (uint8_t *)data
+            .data = (uint8_t*)data
         }
     };
 
-    // Perform write operation
-    // long ret = ioctl(fd, pd, I2C_WRITE_REG, &transfer);
-    long ret = i2c_device_devops.ioctl(fd, pd, I2C_WRITE_REG, &transfer);
+    // long ret = i2c_device_devops.write(fd, &sht4x_device, (const char*)&transfer, sizeof(transfer));
+    long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
 
-    if (ret < 0)
-    {
-        ERR("[ERROR] I2C Write Failed for address 0x%02X: %ld\n", address, ret);
-        return -1;
+    if (ret < 0) {
+        perror("direct write failed");
+        return -2;
     }
 
     return 0;
-
 }
-
 /**
  * Sleep for a given number of microseconds. The function should delay the
  * execution for at least the given time, but may also sleep longer.
@@ -160,4 +164,3 @@ void sensirion_sleep_usec(uint32_t useconds)
 {
     usleep(useconds);
 }
-
