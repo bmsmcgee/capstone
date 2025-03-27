@@ -43,6 +43,7 @@
 
 #define SHT4X_I2C_ADDRESS 0x44
 #define SHT4X_CMD_SOFT_RESET 0x94
+#define SHT4X_CMD_MEASURE_HPM 0xFD
 
 LOG_LEVEL_INIT(LOG_LEVEL_INFO);
 
@@ -61,23 +62,23 @@ void sensirion_i2c_init(void)
 {
     driver_add("/dev/sht45", &sht4x_device, &i2c_device_devops);
 
-    uint8_t cmd = SHT4X_CMD_SOFT_RESET;
+    uint8_t cmd = SHT4X_CMD_MEASURE_HPM;
 
     // fd = i2c_device_devops.open(&sht4x_device, "/dev/sht45", 0, 0);
     fd = open("/dev/sht45", O_RDWR);
     if (fd < 0)
     {
-        perror("failed to open file from device\n");
+        ERR("%s", "failed to open file from device\n");
         return;
     }
 
-    int8_t ret = sensirion_i2c_write(SHT4X_I2C_ADDRESS, &cmd, 1);
+    int8_t ret = sensirion_i2c_write(SHT4X_I2C_ADDRESS, &cmd, sizeof(cmd));
     if (ret < 0)
     {
-        perror("SHT4x init failed\n");
+        ERR("%s", "SHT4x init failed\n");
         return;
     }
-    printf("SHT4x soft reset sent successfully.\n");
+    INFO("%s", "SHT4x init successfully.\n");
 }
 
 /**
@@ -93,22 +94,23 @@ void sensirion_i2c_init(void)
  */
 int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count) {
 
-    i2c_transfer_t transfer = {
-        .addr = {
-            .len = 0,
-            .data = NULL
-        },
-        .value = {
-            .len = count,
-            .data = (uint8_t*)data
-        }
-    };
+    // i2c_transfer_t transfer = {
+    //     .addr = {
+    //         .len = 1,
+    //         .data = 0x00
+    //     },
+    //     .value = {
+    //         .len = count,
+    //         .data = (uint8_t*)data
+    //     }
+    // };
 
     // long ret = i2c_device_devops.write(fd, &sht4x_device, (const char*)&transfer, sizeof(transfer));
-    long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
+    // long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
+    long ret = write(fd, &data, count);
 
     if (ret < 0) {
-        perror("direct write failed");
+        ERR("%s", "direct write failed");
         return -2;
     }
 

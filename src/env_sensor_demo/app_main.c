@@ -40,7 +40,7 @@ int app_main(int argc, const char *argv[])
     int count = 0;
     
     while (1) {
-        printf("this is the %d time the loop has passed", count++);
+        INFO("this is the %d time the loop has passed", count++);
         send_env_data();
         INFO("Example log %lld\n", (long long int) time(0));
         sleep(5);
@@ -55,7 +55,7 @@ static void send_env_data(void)
     bme688_get_measurements(&env);
     float envdata[4] = { env.gas_resistance, env.humidity, env.pressure, env.temperature};
     send_sensor_msg_float_array_by_id(SENSOR_ID_ENV, envdata, 4);
-    printf("%f\n", env.temperature);
+    INFO("%f\n", env.temperature);
 }
 
 // int app_main(int argc, const char *argv[]) {
