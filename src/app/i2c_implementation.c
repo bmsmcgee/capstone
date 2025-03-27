@@ -33,6 +33,7 @@
 #include "sensirion_common.h"
 #include "sensirion_i2c.h"
 #include "drivers/i2c_driver.h"
+#include "sht4x/sht4x.h"
 #include "sensor_message.h"
 #include "sys/ioctl.h" // from sdk
 #include <stdio.h>
@@ -40,6 +41,7 @@
 #include <time.h>
 #include <fcntl.h>
 #include <stdarg.h>
+#include <string.h>
 
 #define SHT4X_I2C_ADDRESS 0x44
 #define SHT4X_CMD_SOFT_RESET 0x94
@@ -47,7 +49,9 @@
 
 LOG_LEVEL_INIT(LOG_LEVEL_INFO);
 
-static int fd = -1;
+// static int fd = -1;
+
+int fd_array[50];
 
 static i2c_device_t sht4x_device = {
     .port = I2C_PORT_1,
@@ -60,25 +64,21 @@ static i2c_device_t sht4x_device = {
  */
 void sensirion_i2c_init(void)
 {
-    driver_add("/dev/sht45", &sht4x_device, &i2c_device_devops);
+    driver_add("/dev/i2c0/sht45", &sht4x_device, &i2c_device_devops);
 
-    uint8_t cmd = SHT4X_CMD_MEASURE_HPM;
+    int fd = open("/dev/i2c0/sht45", 0, 0);
+    if (fd < 0) {
+        printf("Failed to open /dev/i2c0/sht45\n");
+        return;
+    }
+    fd_array[0] = fd;
 
-    // fd = i2c_device_devops.open(&sht4x_device, "/dev/sht45", 0, 0);
-    fd = open("/dev/sht45", O_RDWR);
-    if (fd < 0)
-    {
-        ERR("%s", "failed to open file from device\n");
+    if (sht4x_probe()) {
+        printf("SHT4x probe failed\n");
         return;
     }
 
-    int8_t ret = sensirion_i2c_write(SHT4X_I2C_ADDRESS, &cmd, sizeof(cmd));
-    if (ret < 0)
-    {
-        ERR("%s", "SHT4x init failed\n");
-        return;
-    }
-    INFO("%s", "SHT4x init successfully.\n");
+    printf("SHT4x initialized and ready.\n");
 }
 
 /**
@@ -93,24 +93,38 @@ void sensirion_i2c_init(void)
  * @returns 0 on success, error code otherwise
  */
 int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count) {
+    static uint8_t addr_byte;
+
+    addr_byte = address;
 
     i2c_transfer_t transfer = {
         .addr = {
-            .len = 1,
-            .data = 0x00
+            .len = sizeof(addr_byte),
+            .data = &addr_byte
         },
         .value = {
             .len = count,
-            .data = (uint8_t*)data
+            .data = (uint8_t *)data
         }
     };
 
-    // long ret = i2c_device_devops.write(fd, &sht4x_device, (const char*)&transfer, sizeof(transfer));
+
+    int fd = fd_array[0];
+
+    // I think this doesn't work on my computer because of my laptop architecture being so different
     long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
+
+
+    // int ret = ioctl(fd, I2C_WRITE_REG,
+    //     transfer.addr.len,
+    //     transfer.addr.data,
+    //     transfer.value.len,
+    //     transfer.value.data
+    // );
 
     if (ret < 0) {
         ERR("%s", "direct write failed");
-        return -2;
+        return -1;
     }
 
     return 0;
@@ -139,8 +153,7 @@ int8_t sensirion_i2c_read(uint8_t address, uint8_t *data, uint16_t count)
         }
     };
 
-    // Perform read operation
-    // long ret = i2c_device_devops.ioctl(fd, pd, I2C_READ_REG, &transfer);
+    int fd = fd_array[0];
     long ret = ioctl(fd, I2C_READ_REG, &transfer);
     
 
