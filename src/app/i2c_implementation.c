@@ -94,20 +94,19 @@ void sensirion_i2c_init(void)
  */
 int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count) {
 
-    // i2c_transfer_t transfer = {
-    //     .addr = {
-    //         .len = 1,
-    //         .data = 0x00
-    //     },
-    //     .value = {
-    //         .len = count,
-    //         .data = (uint8_t*)data
-    //     }
-    // };
+    i2c_transfer_t transfer = {
+        .addr = {
+            .len = 1,
+            .data = 0x00
+        },
+        .value = {
+            .len = count,
+            .data = (uint8_t*)data
+        }
+    };
 
     // long ret = i2c_device_devops.write(fd, &sht4x_device, (const char*)&transfer, sizeof(transfer));
-    // long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
-    long ret = write(fd, &data, count);
+    long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
 
     if (ret < 0) {
         ERR("%s", "direct write failed");
