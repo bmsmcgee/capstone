@@ -93,34 +93,27 @@ void sensirion_i2c_init(void)
  * @returns 0 on success, error code otherwise
  */
 int8_t sensirion_i2c_write(uint8_t address, const uint8_t *data, uint16_t count) {
-    static uint8_t addr_byte;
+    // static uint8_t addr_byte;
 
-    addr_byte = address;
+    // addr_byte = address;
 
-    i2c_transfer_t transfer = {
-        .addr = {
-            .len = sizeof(addr_byte),
-            .data = &addr_byte
-        },
-        .value = {
-            .len = count,
-            .data = (uint8_t *)data
-        }
-    };
+    // i2c_transfer_t transfer = {
+    //     .addr = {
+    //         .len = sizeof(addr_byte),
+    //         .data = &addr_byte
+    //     },
+    //     .value = {
+    //         .len = count,
+    //         .data = (uint8_t *)data
+    //     }
+    // };
 
 
     int fd = fd_array[0];
 
     // I think this doesn't work on my computer because of my laptop architecture being so different
-    long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
-
-
-    // int ret = ioctl(fd, I2C_WRITE_REG,
-    //     transfer.addr.len,
-    //     transfer.addr.data,
-    //     transfer.value.len,
-    //     transfer.value.data
-    // );
+    // long ret = ioctl(fd, I2C_WRITE_REG, &transfer);
+    long ret = write(fd, data, count);
 
     if (ret < 0) {
         ERR("%s", "direct write failed");
