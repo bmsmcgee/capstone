@@ -17,6 +17,15 @@
   */
  #define SHT4X_COMMAND_SOFT_RESET            0x94        /**< soft reset command */
  #define SHT4X_COMMAND_READ_SERIAL_NUMBER    0x89        /**< read serial number command */
+
+ static sht4x_handle_t sht4x_handle = {
+    .fd = -1,
+    .device = {
+        .port = I2C_PORT_1,
+        .address = SHT4X_ADDRESS_0
+    },
+    .inited = 0
+ };
  
  /**
   * @brief      write and read bytes
@@ -27,28 +36,41 @@
   * @param[in]  len data length
   * @return     status code
   *             - 0 success
-  *             - 1 write read failed
+  *             - -1 write read failed
   * @note       none
   */
+
  static uint8_t a_sht4x_write_read(sht4x_handle_t *handle, uint8_t cmd, uint16_t delay, uint8_t *data, uint16_t len)
  {
-     if (handle->iic_write_cmd(handle->iic_addr, &cmd, 1) != 0)             /* write command */
-     {
-         return 1;                                                          /* return error */
+     if (!handle) {
+        return -1;
      }
-     if (delay != 0)                                                        /* if not 0 */
-     {
-         handle->delay_ms(delay);                                           /* delay */
+
+     i2c_transfer_t transfer;
+
+     transfer.addr.len = 1;
+     transfer.addr.data = &cmd;
+     transfer.value.len = 0;
+     transfer.value.data = NULL;
+
+     if(ioctl(handle->fd, I2C_WRITE_REG, &transfer) < 0){
+        return -1;
      }
-     if (len != 0)                                                          /* check length */
-     {
-         if (handle->iic_read_cmd(handle->iic_addr, data, len) != 0)        /* read data */
-         {
-             return 1;                                                      /* return error */
-         }
+
+     if (delay > 0){
+        usleep(delay * 1000);
      }
-     
-     return 0;                                                              /* success return 0 */
+
+     if (len > 0) {
+        transfer.value.len = len;
+        transfer.value.data = data;
+
+        if(ioctl(handle->fd, I2C_READ_REG, &transfer) != 0) {
+            return -1;
+        }
+     }
+
+     return 0;
  }
  
  /**
