@@ -14,11 +14,10 @@ extern "C"
 {
 #endif
 
-    typedef enum
-    {
-        SHT4X_ADDRESS_0 = 0x44, /**< address0 */
-        SHT4X_ADDRESS_1 = 0x45, /**< address1 */
-        SHT4X_ADDRESS_2 = 0x46, /**< address2 */
+    typedef enum{
+        SHT4X_ADDRESS_0 = 0x44, 
+        SHT4X_ADDRESS_1 = 0x45, 
+        SHT4X_ADDRESS_2 = 0x46, 
     } sht4x_address_t;
 
     void sht45_init(void);
