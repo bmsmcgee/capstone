@@ -1,5 +1,4 @@
 #include "driver_sht4x.h"
-#include "drivers/i2c_driver.h"
 
 #define CHIP_NAME "Sensirion SHT4X"
 #define MANUFACTURER_NAME "Sensirion"
@@ -21,20 +20,16 @@ static i2c_device_t sht4x_device = {
 int fd = -1;
 
 static uint8_t a_sht4x_write_read(uint8_t cmd, uint16_t delay, uint8_t *data, uint16_t len) {
-    if (write(fd, &cmd, sizeof(cmd)) < 0)
-    {
+    if (write(fd, &cmd, sizeof(cmd)) < 0){
         return -1;
     }
 
-    if (delay > 0)
-    {
+    if (delay > 0){
         usleep(delay * 1000);
     }
 
-    if (len > 0)
-    {
-        if (read(fd, data, len) < 0)
-        {
+    if (len > 0){
+        if (read(fd, data, len) < 0){
             return -1;
         }
     }
