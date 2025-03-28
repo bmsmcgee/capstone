@@ -32,7 +32,19 @@ int app_main(int argc, const char *argv[]) {
 
     INFO("%s", "Initializing I2C communication...");
 
-    sht45_init();
+    uint8_t res = -1;
+    uint8_t count = 0;
+    
+    while(res == -1) {
+        INFO("%s", "Attempting to initialize SHT45 Sensor...");
+        res = sht4x_init();
+
+        if(count++ > 9){
+            ERR("%s", "SHT45 sensor could not initialize... Shutting down process");
+            return -1;
+        }
+        sleep(5);
+    }
 
     INFO("%s", "Sensors detected. Starting data collection...");
 
