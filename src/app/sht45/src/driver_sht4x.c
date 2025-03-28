@@ -126,7 +126,7 @@ uint8_t sht4x_get_serial_number(uint8_t num[4])
     uint8_t res;
     uint8_t buf[6];
 
-    res = a_sht4x_write_read(SHT4X_COMMAND_READ_SERIAL_NUMBER, 10, buf, 6); /* read serial number */
+    res = a_sht4x_write_read(SHT4X_COMMAND_READ_SERIAL_NUMBER, 10, buf, 6); 
     if (res != 0) {
         printf("sht4x: write command failed.\n");
         return -1;
