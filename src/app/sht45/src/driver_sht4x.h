@@ -21,21 +21,6 @@ extern "C"
         SHT4X_ADDRESS_2 = 0x46, /**< address2 */
     } sht4x_address_t;
 
-    typedef struct sht4x_info_s
-    {
-        char chip_name[32];
-        char manufacturer_name[32];
-        char interface[8];
-        float supply_voltage_min_v;
-        float supply_voltage_max_v;
-        float max_current_ma;
-        float temperature_min;
-        float temperature_max;
-        uint32_t driver_version;
-    } sht4x_info_t;
-
-    uint8_t sht4x_info(sht4x_info_t *info);
-
     void sht45_init(void);
 
     uint8_t sht4x_init(void);

@@ -20,8 +20,7 @@ static i2c_device_t sht4x_device = {
 
 int fd = -1;
 
-static uint8_t a_sht4x_write_read(uint8_t cmd, uint16_t delay, uint8_t *data, uint16_t len)
-{
+static uint8_t a_sht4x_write_read(uint8_t cmd, uint16_t delay, uint8_t *data, uint16_t len) {
     if (write(fd, &cmd, sizeof(cmd)) < 0)
     {
         return -1;
@@ -43,79 +42,63 @@ static uint8_t a_sht4x_write_read(uint8_t cmd, uint16_t delay, uint8_t *data, ui
     return 0;
 }
 
-static uint8_t a_sht4x_crc(uint8_t *data, uint16_t len)
-{
+static uint8_t a_sht4x_crc(uint8_t *data, uint16_t len) {
     const uint8_t POLYNOMIAL = 0x31;
     uint8_t crc = 0xFF;
     uint16_t i;
     uint16_t j;
 
-    for (j = len; j != 0; --j)
-    {
+    for (j = len; j != 0; --j) {
         crc ^= *data++;
-        for (i = 8; i != 0; --i)
-        {
+        for (i = 8; i != 0; --i) {
             crc = (crc & 0x80) ? (crc << 1) ^ POLYNOMIAL : (crc << 1);
         }
     }
-
     return crc;
 }
 
-void sht45_init(void)
-{
-    if (sht4x_init() < 0)
-    {
+void sht45_init(void) {
+    if (sht4x_init() < 0) {
         printf("sht45 not initialized");
         return;
     }
 }
 
-uint8_t sht4x_init(void)
-{
-
+uint8_t sht4x_init(void) {
     driver_add("/dev/i2c0/sht45", &sht4x_device, &i2c_device_devops);
 
     fd = open("/dev/i2c0/sht45", 0, 0);
-    if (fd < 0)
-    {
+    if (fd < 0) {
         return -1;
     }
 
-    if (a_sht4x_write_read(SHT4X_COMMAND_SOFT_RESET, 10, NULL, 0) < 0)
-    {
+    if (a_sht4x_write_read(SHT4X_COMMAND_SOFT_RESET, 10, NULL, 0) < 0) {
         close(fd);
         fd = -1;
         return -1;
     }
-
     return 0;
 }
 
-uint8_t sht4x_read(uint16_t *temperature_raw, float *temperature_s, uint16_t *humidity_raw, float *humidity_s)
-{
+uint8_t sht4x_read(uint16_t *temperature_raw, float *temperature_s, uint16_t *humidity_raw, float *humidity_s) {
     uint8_t res;
     uint8_t buf[6];
 
     res = a_sht4x_write_read(SHT4X_MODE_HIGH_PRECISION_WITH_NO_HEATER, 10, buf, 6);
 
-    if (res != 0)
-    {
+    if (res != 0) {
         printf("sht4x: write command failed.\n");
 
         return -1;
     }
 
-    if (a_sht4x_crc(buf + 0, 2) != buf[2])
-    {
+    if (a_sht4x_crc(buf + 0, 2) != buf[2]) {
         printf("sht4x: crc is error.\n");
-
         return -1;
     }
-    if (a_sht4x_crc(buf + 3, 2) != buf[5])
-    {
-        printf("sht4x: crc is error.\n");
 
+    if (a_sht4x_crc(buf + 3, 2) != buf[5]) {
+        printf("sht4x: crc is error.\n");
         return -4;
     }
 
@@ -127,12 +110,11 @@ uint8_t sht4x_read(uint16_t *temperature_raw, float *temperature_s, uint16_t *hu
 
     *humidity_s = (((float)(*humidity_raw) / 65535.0f) * 125.0f - 6.0f);
 
-    if ((*humidity_s) > 100.0f)
-    {
+    if ((*humidity_s) > 100.0f) {
         *humidity_s = 100.0f;
     }
-    if ((*humidity_s) < 0.0f)
-    {
+
+    if ((*humidity_s) < 0.0f) {
         *humidity_s = 0.0f;
     }
 
@@ -145,25 +127,21 @@ uint8_t sht4x_get_serial_number(uint8_t num[4])
     uint8_t buf[6];
 
     res = a_sht4x_write_read(SHT4X_COMMAND_READ_SERIAL_NUMBER, 10, buf, 6); /* read serial number */
-    if (res != 0)
-    {
+    if (res != 0) {
         printf("sht4x: write command failed.\n");
-
         return -1;
     }
 
-    if (a_sht4x_crc(buf + 0, 2) != buf[2])
-    {
+    if (a_sht4x_crc(buf + 0, 2) != buf[2]) {
         printf("sht4x: crc is error.\n");
-
         return -1;
     }
-    if (a_sht4x_crc(buf + 3, 2) != buf[5])
-    {
+
+    if (a_sht4x_crc(buf + 3, 2) != buf[5]) {
         printf("sht4x: crc is error.\n");
-
         return -1;
     }
+
     num[0] = buf[0];
     num[1] = buf[1];
     num[2] = buf[3];
@@ -172,44 +150,19 @@ uint8_t sht4x_get_serial_number(uint8_t num[4])
     return 0;
 }
 
-uint8_t sht4x_soft_reset()
-{
+uint8_t sht4x_soft_reset() {
     uint8_t res;
 
     res = a_sht4x_write_read(SHT4X_COMMAND_SOFT_RESET, 10, NULL, 0);
 
-    if (res != 0)
-    {
+    if (res != 0) {
         printf("sht4x: write command failed.\n");
-
         return -1;
     }
 
     return 0;
 }
 
- uint8_t sht4x_write_read(uint8_t cmd, uint16_t delay_ms, uint8_t *data, uint16_t len)
- {
-     return a_sht4x_write_read(cmd, delay_ms, data, len);       
- }
-
-uint8_t sht4x_info(sht4x_info_t *info)
-{
-    if (info == NULL)
-    {
-        return -1;
-    }
-
-    memset(info, 0, sizeof(sht4x_info_t));                   /* initialize sht4x info structure */
-    strncpy(info->chip_name, CHIP_NAME, 32);                 /* copy chip name */
-    strncpy(info->manufacturer_name, MANUFACTURER_NAME, 32); /* copy manufacturer name */
-    strncpy(info->interface, "IIC", 8);                      /* copy interface name */
-    info->supply_voltage_min_v = SUPPLY_VOLTAGE_MIN;         /* set minimal supply voltage */
-    info->supply_voltage_max_v = SUPPLY_VOLTAGE_MAX;         /* set maximum supply voltage */
-    info->max_current_ma = MAX_CURRENT;                      /* set maximum current */
-    info->temperature_max = TEMPERATURE_MAX;                 /* set minimal temperature */
-    info->temperature_min = TEMPERATURE_MIN;                 /* set maximum temperature */
-    info->driver_version = DRIVER_VERSION;                   /* set driver version */
-
-    return 0;
+uint8_t sht4x_write_read(uint8_t cmd, uint16_t delay_ms, uint8_t *data, uint16_t len) {
+    return a_sht4x_write_read(cmd, delay_ms, data, len);       
 }
